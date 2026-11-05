@@ -1,30 +1,70 @@
 package com.tecsup.petclinic.services;
 
-import com.tecsup.petclinic.entities.Vet;
-import com.tecsup.petclinic.exception.VetNotFoundException;
-import com.tecsup.petclinic.repositories.VetRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.tecsup.petclinic.dtos.VetDTO;
+import com.tecsup.petclinic.exceptions.VetNotFoundException;
 
 import java.util.List;
 
-@Service
-public class VetService {
+/**
+ * Servicio para la gestion de veterinarios.
+ */
+public interface VetService {
 
-    @Autowired
-    private VetRepository vetRepository;
+    /**
+     * Crea un nuevo veterinario (activo por defecto).
+     *
+     * @param vetDTO datos del veterinario a crear
+     * @return veterinario creado con su id
+     */
+    VetDTO create(VetDTO vetDTO);
 
-    public Vet findById(Integer id) throws VetNotFoundException {
-        return vetRepository.findById(id)
-                .orElseThrow(() -> new VetNotFoundException("Veterinario no encontrado con ID: " + id));
-    }
+    /**
+     * Actualiza los datos de un veterinario existente.
+     *
+     * @param vetDTO datos actualizados (debe incluir el id)
+     * @return veterinario actualizado
+     * @throws VetNotFoundException si no existe el veterinario
+     */
+    VetDTO update(VetDTO vetDTO) throws VetNotFoundException;
 
-    public void delete(Integer id) throws VetNotFoundException {
-        Vet vet = findById(id);
-        vetRepository.delete(vet);
-    }
+    /**
+     * Busca un veterinario por su id.
+     *
+     * @param id identificador del veterinario
+     * @return veterinario encontrado
+     * @throws VetNotFoundException si no existe el veterinario
+     */
+    VetDTO findById(Integer id) throws VetNotFoundException;
 
-    public List<Vet> findAll() {
-        return vetRepository.findAll();
-    }
+    /**
+     * Desactiva un veterinario (borrado logico, no elimina el registro).
+     *
+     * @param id identificador del veterinario
+     * @return veterinario con active = false
+     * @throws VetNotFoundException si no existe el veterinario
+     */
+    VetDTO deactivate(Integer id) throws VetNotFoundException;
+
+    /**
+     * Reactiva un veterinario desactivado.
+     *
+     * @param id identificador del veterinario
+     * @return veterinario con active = true
+     * @throws VetNotFoundException si no existe el veterinario
+     */
+    VetDTO reactivate(Integer id) throws VetNotFoundException;
+
+    /**
+     * Lista los veterinarios activos.
+     *
+     * @return lista de veterinarios con active = true
+     */
+    List<VetDTO> findActiveVets();
+
+    /**
+     * Lista los veterinarios inactivos.
+     *
+     * @return lista de veterinarios con active = false
+     */
+    List<VetDTO> findInactiveVets();
 }
